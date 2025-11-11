@@ -1,0 +1,8 @@
+//
+// Created by Ванесса Гудан on 11.11.2025.
+//
+
+#ifndef KURSOVA_DATABASEMANAGER_H
+#define KURSOVA_DATABASEMANAGER_H
+
+#endif //KURSOVA_DATABASEMANAGER_H
