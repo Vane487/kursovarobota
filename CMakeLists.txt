@@ -13,4 +13,7 @@ add_executable(Kursova main.cpp
         DatabaseManager.cpp
         DatabaseManager.h
         Admin.cpp
-        Admin.h)
+        Admin.h
+        Person.cpp
+        Person.h
+        Teacher.cpp)
