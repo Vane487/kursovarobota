@@ -1,167 +1,238 @@
 #include "Teacher.h"
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 #ifdef _WIN32
-    #include <windows.h>
+#include <windows.h>
 #endif
 
 using namespace std;
 
-void Teacher::setupUkrainianSupport() const {
+namespace University {
+
+// Статична ініціалізація
+bool Teacher::ukrainianSupportInitialized = false;
+
+//-----------------------------------------------------------------------------
+// Приватні методи
+//-----------------------------------------------------------------------------
+bool Teacher::validateTeacherID(const string& id) const
+{
+    return !id.empty() && all_of(id.begin(), id.end(), [](char c)
+    {
+        return isalnum(c);
+    });
+}
+
+void Teacher::initializeUkrainianSupport()
+{
+    if (ukrainianSupportInitialized)
+    {
+        return;
+    }
+
 #ifdef _WIN32
     SetConsoleOutputCP(CP_UTF8);
     SetConsoleCP(CP_UTF8);
 #endif
-    try {
+
+    try
+    {
         setlocale(LC_ALL, "uk_UA.UTF-8");
-    } catch (...) {
-        try {
+    }
+    catch (...)
+    {
+        try
+        {
             setlocale(LC_ALL, "C.UTF-8");
-        } catch (...) {
+        }
+        catch (...)
+        {
             setlocale(LC_ALL, "");
         }
     }
+
+    ukrainianSupportInitialized = true;
 }
 
-Teacher::Teacher() : Person(), teacherID(""), department(""), academicDegree(""), subjectId("") {
-    setupUkrainianSupport();
+//-----------------------------------------------------------------------------
+// Конструктори
+//-----------------------------------------------------------------------------
+Teacher::Teacher()
+    : Person(), teacherID(""), department(""),
+      academicDegree(AcademicDegree::BACHELOR), subjectId("")
+{
+    initializeUkrainianSupport();
     cout << "Конструктор Teacher за замовчуванням викликаний" << endl;
 }
 
 Teacher::Teacher(const string& name, const string& lastName,
-                 const string& email,
-                 const string& teacherID, const string& department,
-                 const string& academicDegree)
-    : Person(name, lastName, email),
-      teacherID(teacherID), department(department), academicDegree(academicDegree), subjectId("") {
-    setupUkrainianSupport();
-    if (!validateTeacherID(teacherID)) {
+                 const string& email, const string& teacherID,
+                 const string& department, AcademicDegree degree)
+    : Person(name, lastName, email), teacherID(teacherID),
+      department(department), academicDegree(degree), subjectId("")
+{
+    initializeUkrainianSupport();
+
+    if (!validateTeacherID(teacherID))
+    {
         throw invalid_argument("Некоректний ID викладача: " + teacherID);
     }
-    cout << "Конструктор Teacher з параметрами викликаний для: " << getFullName() << endl;
+
+    cout << "Конструктор Teacher з параметрами викликаний для: "
+         << getFullName() << endl;
 }
 
 Teacher::Teacher(const Teacher& other)
-    : Person(other),
-      teacherID(other.teacherID),
+    : Person(other), teacherID(other.teacherID),
       department(other.department),
       academicDegree(other.academicDegree),
-      subjectId(other.subjectId) {
-    setupUkrainianSupport();
-    cout << "Копіювальний конструктор Teacher викликаний для: " << getFullName() << endl;
+      subjectId(other.subjectId)
+{
+    cout << "Копіювальний конструктор Teacher викликаний для: "
+         << getFullName() << endl;
 }
 
 Teacher::Teacher(Teacher&& other) noexcept
-    : Person(move(other)),
-      teacherID(move(other.teacherID)),
+    : Person(move(other)), teacherID(move(other.teacherID)),
       department(move(other.department)),
       academicDegree(move(other.academicDegree)),
-      subjectId(move(other.subjectId)) {
-    setupUkrainianSupport();
-    cout << "Переміщувальний конструктор Teacher викликаний для: " << getFullName() << endl;
+      subjectId(move(other.subjectId))
+{
+    cout << "Переміщувальний конструктор Teacher викликаний для: "
+         << getFullName() << endl;
 }
 
-Teacher::~Teacher() {
-    setupUkrainianSupport();
-    cout << "Об'єкт Teacher знищено: " << getName() << " " << getLastName() << " (" << teacherID << ")" << endl;
+Teacher::~Teacher()
+{
+    cout << "Об'єкт Teacher знищено: " << getName() << " "
+         << getLastName() << " (" << teacherID << ")" << endl;
 }
 
-void Teacher::setTeacherID(const string& teacherID) {
-    if (!validateTeacherID(teacherID)) {
-        throw invalid_argument("Некоректний ID викладача: " + teacherID);
+//-----------------------------------------------------------------------------
+// Властивості
+//-----------------------------------------------------------------------------
+string Teacher::getTeacherID() const { return teacherID; }
+string Teacher::getDepartment() const { return department; }
+AcademicDegree Teacher::getAcademicDegree() const { return academicDegree; }
+string Teacher::getSubjectId() const { return subjectId; }
+
+string Teacher::getAcademicDegreeString() const
+{
+    switch (academicDegree)
+    {
+        case AcademicDegree::BACHELOR: return "Бакалавр";
+        case AcademicDegree::MASTER:   return "Магістр";
+        case AcademicDegree::DOCTOR:   return "Доктор наук";
+        default:                       return "Невідомий ступінь";
     }
-    this->teacherID = teacherID;
 }
 
-void Teacher::setDepartment(const string& department) {
-    if (department.empty()) {
+void Teacher::setTeacherID(const string& id)
+{
+    if (!validateTeacherID(id))
+    {
+        throw invalid_argument("Некоректний ID викладача: " + id);
+    }
+    teacherID = id;
+}
+
+void Teacher::setDepartment(const string& dep)
+{
+    if (dep.empty())
+    {
         throw invalid_argument("Кафедра не може бути порожньою");
     }
-    this->department = department;
+    department = dep;
 }
 
-void Teacher::setAcademicDegree(const string& academicDegree) {
-    if (academicDegree.empty()) {
-        throw invalid_argument("Науковий ступінь не може бути порожнім");
-    }
-    this->academicDegree = academicDegree;
-}
+void Teacher::setAcademicDegree(AcademicDegree deg) { academicDegree = deg; }
+void Teacher::setSubjectId(const string& subId) { subjectId = subId; }
 
-void Teacher::setSubjectId(const string& subjectId) {
-    this->subjectId = subjectId;
-}
-
-bool Teacher::assignToSubject(const string& subjectId) {
-    if (subjectId.empty()) return false;
-    this->subjectId = subjectId;
+//-----------------------------------------------------------------------------
+// Методи
+//-----------------------------------------------------------------------------
+bool Teacher::assignToSubject(const string& subId)
+{
+    if (subId.empty()) return false;
+    subjectId = subId;
     return true;
 }
 
-bool Teacher::removeFromSubject() {
+bool Teacher::removeFromSubject()
+{
     if (subjectId.empty()) return false;
-    subjectId = "";
+    subjectId.clear();
     return true;
 }
 
-bool Teacher::hasAssignedSubject() const {
-    return !subjectId.empty();
+bool Teacher::hasAssignedSubject() const { return !subjectId.empty(); }
+
+void Teacher::promote(AcademicDegree newDegree) { setAcademicDegree(newDegree); }
+void Teacher::changeDepartment(const string& newDep) { setDepartment(newDep); }
+
+bool Teacher::canTeachSubject(const string& subId) const
+{
+    return !hasAssignedSubject() || subjectId == subId;
 }
 
-void Teacher::promote(const string& newDegree) {
-    setAcademicDegree(newDegree);
+string Teacher::getTeachingStatus() const
+{
+    return subjectId.empty() ? "Вільний"
+                             : "Викладає предмет " + subjectId;
 }
 
-void Teacher::changeDepartment(const string& newDepartment) {
-    setDepartment(newDepartment);
+double Teacher::calculateWorkload() const
+{
+    return hasAssignedSubject() ? DEFAULT_WORKLOAD_HOURS : 0.0;
 }
 
-bool Teacher::canTeachSubject(const string& subjectId) const {
-    return !hasAssignedSubject() || this->subjectId == subjectId;
+bool Teacher::isAvailableForNewSubject() const { return !hasAssignedSubject(); }
+
+void Teacher::updateAcademicProfile(AcademicDegree deg, const string& dep)
+{
+    setAcademicDegree(deg);
+    setDepartment(dep);
 }
 
-string Teacher::getTeachingStatus() const {
-    if (subjectId.empty()) return "Вільний";
-    return "Викладає предмет " + subjectId;
-}
-
-double Teacher::calculateWorkload() const {
-    return hasAssignedSubject() ? 120.0 : 0.0;
-}
-
-bool Teacher::isAvailableForNewSubject() const {
-    return !hasAssignedSubject();
-}
-
-void Teacher::updateAcademicProfile(const string& newDegree, const string& newDepartment) {
-    setAcademicDegree(newDegree);
-    setDepartment(newDepartment);
-}
-
-void Teacher::print() const {
-    setupUkrainianSupport();
+//-----------------------------------------------------------------------------
+// Перевизначені методи
+//-----------------------------------------------------------------------------
+void Teacher::print() const
+{
     cout << "Викладач: " << getFullName() << endl;
     cout << "ID: " << teacherID << endl;
     cout << "Кафедра: " << department << endl;
-    cout << "Науковий ступінь: " << academicDegree << endl;
+    cout << "Науковий ступінь: " << getAcademicDegreeString() << endl;
     cout << "Email: " << getEmail() << endl;
     cout << "Статус: " << getTeachingStatus() << endl;
 }
 
-string Teacher::toString() const {
+string Teacher::toString() const
+{
     stringstream ss;
-    ss << "Teacher{name: " << getName() << ", lastName: " << getLastName()
-       << ", teacherID: " << teacherID << ", department: " << department
-       << ", degree: " << academicDegree << ", subject: " << subjectId << "}";
+    ss << "Teacher{name: " << getName()
+       << ", lastName: " << getLastName()
+       << ", teacherID: " << teacherID
+       << ", department: " << department
+       << ", degree: " << getAcademicDegreeString()
+       << ", subject: " << subjectId << "}";
     return ss.str();
 }
 
-bool Teacher::isValid() const {
-    return Person::isValid() && !teacherID.empty() && !department.empty() && !academicDegree.empty();
+bool Teacher::isValid() const
+{
+    return Person::isValid() && !teacherID.empty() && !department.empty();
 }
 
-Teacher& Teacher::operator=(const Teacher& other) {
-    if (this != &other) {
+//-----------------------------------------------------------------------------
+// Оператори
+//-----------------------------------------------------------------------------
+Teacher& Teacher::operator=(const Teacher& other)
+{
+    if (this != &other)
+    {
         Person::operator=(other);
         teacherID = other.teacherID;
         department = other.department;
@@ -171,8 +242,10 @@ Teacher& Teacher::operator=(const Teacher& other) {
     return *this;
 }
 
-Teacher& Teacher::operator=(Teacher&& other) noexcept {
-    if (this != &other) {
+Teacher& Teacher::operator=(Teacher&& other) noexcept
+{
+    if (this != &other)
+    {
         Person::operator=(move(other));
         teacherID = move(other.teacherID);
         department = move(other.department);
@@ -182,17 +255,11 @@ Teacher& Teacher::operator=(Teacher&& other) noexcept {
     return *this;
 }
 
-bool Teacher::operator==(const Teacher& other) const {
+bool Teacher::operator==(const Teacher& other) const
+{
     return Person::operator==(other) && teacherID == other.teacherID;
 }
 
-bool Teacher::operator!=(const Teacher& other) const {
-    return !(*this == other);
-}
+bool Teacher::operator!=(const Teacher& other) const { return !(*this == other); }
 
-bool Teacher::validateTeacherID(const string& id) const {
-    if (id.empty()) return false;
-    return all_of(id.begin(), id.end(), [](char c) {
-        return isalnum(c);
-    });
-}
+} // namespace University

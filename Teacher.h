@@ -1,50 +1,91 @@
 #pragma once
+
 #include "Person.h"
 #include <string>
 #include <stdexcept>
 #include <iostream>
 
-class Teacher : public Person {
+
+namespace University {
+    using namespace std;
+
+/**
+ * @enum AcademicDegree
+ * @brief Наукові ступені викладачів
+ */
+enum class AcademicDegree {
+    BACHELOR,      ///< Бакалавр
+    MASTER,        ///< Магістр
+    DOCTOR         ///< Доктор наук
+};
+
+/**
+ * @class Teacher
+ * @brief Клас, що представляє викладача університету
+ *
+ * Надає функціонал для управління інформацією про викладача,
+ * включаючи призначення предметів, управління кафедрою та
+ * науковим ступенем.
+ */
+class Teacher : public Person
+{
 private:
-    std::string teacherID;
-    std::string department;
-    std::string academicDegree;
-    std::string subjectId;
+    // Поля
+    std::string teacherID;                  ///< Ідентифікатор викладача
+    std::string department;                 ///< Кафедра
+    AcademicDegree academicDegree;          ///< Науковий ступінь
+    std::string subjectId;                  ///< Ідентифікатор предмету
+    static bool ukrainianSupportInitialized; ///< Підтримка української мови
+
+    static constexpr double DEFAULT_WORKLOAD_HOURS = 120.0; ///< Стандартне навантаження
+
+    // Приватні методи
+    /**
+     * @brief Валідує ідентифікатор викладача
+     * @param id Ідентифікатор для валідації
+     * @return true якщо ідентифікатор коректний
+     */
+    bool validateTeacherID(const std::string& id) const;
+
+    /**
+     * @brief Ініціалізує підтримку української мови
+     */
+    void initializeUkrainianSupport();
 
 public:
-    // Конструктори
+    // Конструктори та деструктор
     Teacher();
     Teacher(const std::string& name, const std::string& lastName,
-            const std::string& email,
-            const std::string& teacherID, const std::string& department,
-            const std::string& academicDegree);
+            const std::string& email, const std::string& teacherID,
+            const std::string& department, AcademicDegree degree);
     Teacher(const Teacher& other);
     Teacher(Teacher&& other) noexcept;
     ~Teacher() override;
 
-    // Getter методи
-    std::string getTeacherID() const { return teacherID; }
-    std::string getDepartment() const { return department; }
-    std::string getAcademicDegree() const { return academicDegree; }
-    std::string getSubjectId() const { return subjectId; }
+    // Властивості
+    std::string getTeacherID() const;
+    std::string getDepartment() const;
+    AcademicDegree getAcademicDegree() const;
+    std::string getSubjectId() const;
+    std::string getAcademicDegreeString() const;
 
-    // Setter методи
     void setTeacherID(const std::string& teacherID);
     void setDepartment(const std::string& department);
-    void setAcademicDegree(const std::string& academicDegree);
+    void setAcademicDegree(AcademicDegree degree);
     void setSubjectId(const std::string& subjectId);
 
-    // ВЛАСНІ МЕТОДИ (7+ методів):
+    // Методи
     bool assignToSubject(const std::string& subjectId);
     bool removeFromSubject();
     bool hasAssignedSubject() const;
-    void promote(const std::string& newDegree);
+    void promote(AcademicDegree newDegree);
     void changeDepartment(const std::string& newDepartment);
     bool canTeachSubject(const std::string& subjectId) const;
     std::string getTeachingStatus() const;
     double calculateWorkload() const;
     bool isAvailableForNewSubject() const;
-    void updateAcademicProfile(const std::string& newDegree, const std::string& newDepartment);
+    void updateAcademicProfile(AcademicDegree newDegree,
+                              const std::string& newDepartment);
 
     // Перевизначені методи
     void print() const override;
@@ -56,8 +97,6 @@ public:
     Teacher& operator=(Teacher&& other) noexcept;
     bool operator==(const Teacher& other) const;
     bool operator!=(const Teacher& other) const;
-
-private:
-    bool validateTeacherID(const std::string& id) const;
-    void setupUkrainianSupport() const;
 };
+
+} // namespace University

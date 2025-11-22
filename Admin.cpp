@@ -7,248 +7,365 @@
 
 using namespace std;
 
-// Конструктори та деструктор
-Admin::Admin() : username("admin"), password("admin123") {
+Admin::Admin() : m_username("admin"), m_password("admin123")
+{
     cout << "Admin конструктор за замовчуванням викликаний" << endl;
-    initializeDefaultAdmin();
+    InitializeDefaultAdmin();
 }
 
 Admin::Admin(const string& username, const string& password)
-    : username(username), password(password) {
-    cout << "Admin конструктор з параметрами викликаний для: " << username << endl;
-    initializeDefaultAdmin();
+    : m_username(username), m_password(password)
+{
+    cout << "Admin конструктор з параметрами викликаний для: "
+         << username << endl;
+    InitializeDefaultAdmin();
 }
 
 Admin::Admin(const Admin& other)
-    : username(other.username), password(other.password), users(other.users) {
+    : m_username(other.m_username), m_password(other.m_password),
+      m_users(other.m_users)
+{
     cout << "Admin копіювальний конструктор викликаний" << endl;
 }
 
 Admin::Admin(Admin&& other) noexcept
-    : username(move(other.username)), password(move(other.password)), users(move(other.users)) {
+    : m_username(move(other.m_username)), m_password(move(other.m_password)),
+      m_users(move(other.m_users))
+{
     cout << "Admin переміщувальний конструктор викликаний" << endl;
 }
 
-Admin::~Admin() {
-    cout << "Admin деструктор викликаний для: " << username << endl;
-    cout << "Знищено: " << users.size() << " користувачів" << endl;
+Admin::~Admin()
+{
+    cout << "Admin деструктор викликаний для: " << m_username << endl;
+    cout << "Знищено: " << m_users.size() << " користувачів" << endl;
 }
 
-// Setter методи
-void Admin::setUsername(const string& newUsername) {
-    if (newUsername.empty()) {
+void Admin::InitializeDefaultAdmin()
+{
+    if (m_users.empty())
+    {
+        // Додаємо адміністратора за замовчуванням
+        m_users["admin"] = UserData("admin123", UserRole::ADMIN);
+    }
+}
+
+string Admin::RoleToString(UserRole role) const
+{
+    switch (role) {
+        case UserRole::ADMIN: return "ADMIN";
+        case UserRole::STUDENT: return "STUDENT";
+        default: return "STUDENT";
+    }
+}
+
+UserRole Admin::StringToRole(const string& roleStr) const
+{
+    if (roleStr == "ADMIN") return UserRole::ADMIN;
+    if (roleStr == "STUDENT") return UserRole::STUDENT;
+    return UserRole::STUDENT; // за замовчуванням
+}
+
+void Admin::SetUsername(const string& newUsername)
+{
+    if (newUsername.empty())
+    {
         throw invalid_argument("Ім'я користувача не може бути порожнім");
     }
-    this->username = newUsername;
+    m_username = newUsername;
 }
 
-void Admin::setPassword(const string& newPassword) {
-    if (!validatePassword(newPassword)) {
+void Admin::SetPassword(const string& newPassword)
+{
+    if (!ValidatePassword(newPassword))
+    {
         throw invalid_argument("Новий пароль не відповідає вимогам безпеки");
     }
-    this->password = newPassword;
+    m_password = newPassword;
 }
 
-void Admin::setUsers(const unordered_map<string, string>& newUsers) {
-    this->users = newUsers;
-}
-
-// Оператори
-Admin& Admin::operator=(const Admin& other) {
-    if (this != &other) {
-        username = other.username;
-        password = other.password;
-        users = other.users;
+Admin& Admin::operator=(const Admin& other)
+{
+    if (this != &other)
+    {
+        m_username = other.m_username;
+        m_password = other.m_password;
+        m_users = other.m_users;
     }
     return *this;
 }
 
-Admin& Admin::operator=(Admin&& other) noexcept {
-    if (this != &other) {
-        username = move(other.username);
-        password = move(other.password);
-        users = move(other.users);
+Admin& Admin::operator=(Admin&& other) noexcept
+{
+    if (this != &other)
+    {
+        m_username = move(other.m_username);
+        m_password = move(other.m_password);
+        m_users = move(other.m_users);
     }
     return *this;
 }
 
-bool Admin::operator==(const Admin& other) const {
-    return username == other.username && password == other.password;
+bool Admin::operator==(const Admin& other) const
+{
+    return m_username == other.m_username && m_password == other.m_password;
 }
 
-// Решта методів залишаються без змін...
-void Admin::initializeDefaultAdmin() {
-    if (users.empty()) {
-        users["admin"] = "admin123";
-    }
-}
-
-string Admin::hashPassword(const string& password) const {
+string Admin::HashPassword(const string& password) const
+{
     hash<string> hasher;
     return to_string(hasher(password));
 }
 
-bool Admin::verifyPassword(const string& inputPassword, const string& storedPassword) const {
+bool Admin::VerifyPassword(const string& inputPassword,
+                          const string& storedPassword) const
+{
     return inputPassword == storedPassword;
 }
 
-bool Admin::addUser(const string& username, const string& password) {
-    if (username.empty()) {
+bool Admin::AddUser(const string& username, const string& password, UserRole role)
+{
+    if (username.empty())
+    {
         throw invalid_argument("Ім'я користувача не може бути порожнім");
     }
-    if (!validatePassword(password)) {
+    if (!ValidatePassword(password))
+    {
         throw invalid_argument("Пароль не відповідає вимогам безпеки");
     }
-    if (userExists(username)) {
+    if (UserExists(username))
+    {
         throw invalid_argument("Користувач з таким іменем вже існує: " + username);
     }
 
-    users[username] = password;
+    m_users[username] = UserData(password, role);
 
-    if (!saveUsersToFile("users.txt")) {
+    if (!SaveUsersToFile("users.txt"))
+    {
         throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
+    cout << "✅ Користувача '" << username << "' успішно додано!" << endl;
     return true;
 }
 
-bool Admin::removeUser(const string& username) {
-    if (username.empty()) {
+bool Admin::RemoveUser(const string& username)
+{
+    if (username.empty())
+    {
         throw invalid_argument("Ім'я користувача не може бути порожнім");
     }
-    if (!userExists(username)) {
+    if (!UserExists(username))
+    {
         throw invalid_argument("Користувач не існує: " + username);
     }
-    if (username == "admin") {
+    if (username == "admin")
+    {
         throw invalid_argument("Не можна видалити адміністратора");
     }
 
-    users.erase(username);
+    m_users.erase(username);
 
-    if (!saveUsersToFile("users.txt")) {
+    if (!SaveUsersToFile("users.txt"))
+    {
         throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
+    cout << "✅ Користувача '" << username << "' успішно видалено!" << endl;
     return true;
 }
 
-bool Admin::changePassword(const string& username, const string& newPassword) {
-    if (username.empty()) {
+bool Admin::ChangePassword(const string& username, const string& newPassword)
+{
+    if (username.empty())
+    {
         throw invalid_argument("Ім'я користувача не може бути порожнім");
     }
-    if (!validatePassword(newPassword)) {
+    if (!ValidatePassword(newPassword))
+    {
         throw invalid_argument("Новий пароль не відповідає вимогам безпеки");
     }
-    if (!userExists(username)) {
+    if (!UserExists(username))
+    {
         throw invalid_argument("Користувач не існує: " + username);
     }
 
-    users[username] = newPassword;
+    m_users[username].password = newPassword;
 
-    if (!saveUsersToFile("users.txt")) {
+    if (!SaveUsersToFile("users.txt"))
+    {
         throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
+    cout << "✅ Пароль для користувача '" << username << "' успішно змінено!" << endl;
     return true;
 }
 
-bool Admin::authenticate(const string& username, const string& password) const {
-    if (username.empty() || password.empty()) {
-        return false;
+bool Admin::ChangeUserRole(const string& username, UserRole newRole)
+{
+    if (username.empty())
+    {
+        throw invalid_argument("Ім'я користувача не може бути порожнім");
+    }
+    if (!UserExists(username))
+    {
+        throw invalid_argument("Користувач не існує: " + username);
+    }
+    if (username == "admin" && newRole != UserRole::ADMIN)
+    {
+        throw invalid_argument("Не можна змінити роль головного адміністратора");
     }
 
-    auto it = users.find(username);
-    if (it == users.end()) {
-        return false;
+    m_users[username].role = newRole;
+
+    if (!SaveUsersToFile("users.txt"))
+    {
+        throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
-    return verifyPassword(password, it->second);
+    cout << "✅ Роль користувача '" << username << "' успішно змінено на "
+         << RoleToString(newRole) << "!" << endl;
+    return true;
 }
 
-void Admin::listUsers() const {
-    cout << "Список користувачів (" << users.size() << "):" << endl;
-    for (const auto& user : users) {
-        cout << "  " << user.first;
-        if (user.first == "admin") {
-            cout << " (адміністратор)";
+bool Admin::Authenticate(const string& username, const string& password) const
+{
+    if (username.empty() || password.empty())
+    {
+        return false;
+    }
+
+    auto it = m_users.find(username);
+    if (it == m_users.end())
+    {
+        return false;
+    }
+
+    return VerifyPassword(password, it->second.password);
+}
+
+UserRole Admin::GetUserRole(const string& username) const
+{
+    auto it = m_users.find(username);
+    if (it == m_users.end())
+    {
+        throw invalid_argument("Користувач не існує: " + username);
+    }
+    return it->second.role;
+}
+
+void Admin::ListUsers() const
+{
+    cout << "Список користувачів (" << m_users.size() << "):" << endl;
+    for (const auto& user : m_users)
+    {
+        cout << "  " << user.first << " (" << RoleToString(user.second.role) << ")";
+        if (user.first == "admin")
+        {
+            cout << " - головний адміністратор";
         }
         cout << endl;
     }
 }
 
-void Admin::resetPassword(const string& username) {
-    if (username.empty()) {
+void Admin::ResetPassword(const string& username)
+{
+    if (username.empty())
+    {
         throw invalid_argument("Ім'я користувача не може бути порожнім");
     }
-    if (!userExists(username)) {
+    if (!UserExists(username))
+    {
         throw invalid_argument("Користувач не існує: " + username);
     }
 
     string defaultPassword = "password123";
-    users[username] = defaultPassword;
+    m_users[username].password = defaultPassword;
 
-    if (!saveUsersToFile("users.txt")) {
+    if (!SaveUsersToFile("users.txt"))
+    {
         throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
-    cout << "Пароль для користувача " << username << " скинуто на: " << defaultPassword << endl;
+    cout << "Пароль для користувача " << username << " скинуто на: "
+         << defaultPassword << endl;
 }
 
-void Admin::exportUsers(const string& filename) const {
+void Admin::ExportUsers(const string& filename) const
+{
     ofstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         throw runtime_error("Не вдалося відкрити файл для експорту: " + filename);
     }
 
-    for (const auto& user : users) {
-        file << user.first << ":" << user.second << endl;
+    for (const auto& user : m_users)
+    {
+        file << user.first << ":" << user.second.password << ":"
+             << RoleToString(user.second.role) << endl;
     }
 
     file.close();
 }
 
-bool Admin::loadUsersFromFile(const string& filename) {
+bool Admin::LoadUsersFromFile(const string& filename)
+{
     ifstream file(filename);
-    if (!file.is_open()) {
-        cout << "Файл " << filename << " не знайдено. Буде створено новий при першому збереженні." << endl;
+    if (!file.is_open())
+    {
+        cout << "Файл " << filename << " не знайдено. Буде створено новий "
+             << "при першому збереженні." << endl;
         return false;
     }
 
-    unordered_map<string, string> oldUsers = users;
-    users.clear();
+    unordered_map<string, UserData> oldUsers = m_users;
+    m_users.clear();
 
     string line;
     bool hasErrors = false;
     int loadedCount = 0;
 
-    while (getline(file, line)) {
-        size_t pos = line.find(':');
-        if (pos != string::npos) {
-            string username = line.substr(0, pos);
-            string password = line.substr(pos + 1);
+    while (getline(file, line))
+    {
+        stringstream ss(line);
+        string username, password, roleStr;
 
-            if (!username.empty() && !password.empty()) {
-                users[username] = password;
+        if (getline(ss, username, ':') &&
+            getline(ss, password, ':') &&
+            getline(ss, roleStr))
+        {
+            if (!username.empty() && !password.empty())
+            {
+                UserRole role = StringToRole(roleStr);
+                m_users[username] = UserData(password, role);
                 loadedCount++;
-            } else {
-                hasErrors = true;
-                cout << "Попередження: Знайдено неправильний запис у файлі: " << line << endl;
             }
-        } else {
+            else
+            {
+                hasErrors = true;
+                cout << "Попередження: Знайдено неправильний запис у файлі: "
+                     << line << endl;
+            }
+        }
+        else
+        {
             hasErrors = true;
-            cout << "Попередження: Неправильний формат рядка у файлі: " << line << endl;
+            cout << "Попередження: Неправильний формат рядка у файлі: "
+                 << line << endl;
         }
     }
 
     file.close();
 
-    if (users.empty() && !oldUsers.empty()) {
-        users = oldUsers;
+    if (m_users.empty() && !oldUsers.empty())
+    {
+        m_users = oldUsers;
         cout << "Відновлено попередніх користувачів." << endl;
     }
 
-    if (users.find("admin") == users.end()) {
-        users["admin"] = "admin123";
+    if (m_users.find("admin") == m_users.end())
+    {
+        m_users["admin"] = UserData("admin123", UserRole::ADMIN);
         cout << "Додано адміністратора за замовчуванням." << endl;
     }
 
@@ -256,82 +373,104 @@ bool Admin::loadUsersFromFile(const string& filename) {
     return !hasErrors;
 }
 
-bool Admin::saveUsersToFile(const string& filename) const {
+bool Admin::SaveUsersToFile(const string& filename) const
+{
     ofstream file(filename);
-    if (!file.is_open()) {
+    if (!file.is_open())
+    {
         cout << "Помилка: Не вдалося відкрити файл для запису: " << filename << endl;
         return false;
     }
 
-    for (const auto& user : users) {
-        file << user.first << ":" << user.second << endl;
+    for (const auto& user : m_users)
+    {
+        file << user.first << ":" << user.second.password << ":"
+             << RoleToString(user.second.role) << endl;
     }
 
     file.close();
-    cout << "Збережено " << users.size() << " користувачів у файл: " << filename << endl;
+    cout << "Збережено " << m_users.size() << " користувачів у файл: "
+         << filename << endl;
     return true;
 }
 
-bool Admin::validatePassword(const string& password) {
-    if (password.length() < 6) {
+bool Admin::ValidatePassword(const string& password)
+{
+    if (password.length() < 6)
+    {
         throw invalid_argument("Пароль повинен містити щонайменше 6 символів");
     }
 
     bool hasLetter = false;
     bool hasDigit = false;
 
-    for (char c : password) {
+    for (char c : password)
+    {
         if (isalpha(c)) hasLetter = true;
         if (isdigit(c)) hasDigit = true;
     }
 
-    if (!hasLetter || !hasDigit) {
+    if (!hasLetter || !hasDigit)
+    {
         throw invalid_argument("Пароль повинен містити як літери, так і цифри");
     }
 
     return true;
 }
 
-bool Admin::userExists(const string& username) const {
-    return users.find(username) != users.end();
+bool Admin::UserExists(const string& username) const
+{
+    return m_users.find(username) != m_users.end();
 }
 
-int Admin::getUserCount() const {
-    return users.size();
+int Admin::GetUserCount() const
+{
+    return m_users.size();
 }
 
-void Admin::displayUserInfo(const string& username) const {
-    if (!userExists(username)) {
+void Admin::DisplayUserInfo(const string& username) const
+{
+    if (!UserExists(username))
+    {
         throw invalid_argument("Користувач не існує: " + username);
     }
 
+    const UserData& userData = m_users.at(username);
     cout << "Інформація про користувача:" << endl;
     cout << "  Ім'я: " << username << endl;
-    cout << "  Тип: " << (username == "admin" ? "Адміністратор" : "Звичайний користувач") << endl;
-    cout << "  Пароль: " << users.at(username) << endl;
+    cout << "  Роль: " << RoleToString(userData.role) << endl;
+    cout << "  Пароль: " << userData.password << endl;
 }
 
-bool Admin::isAdminUser(const string& username) const {
-    return username == "admin";
+bool Admin::IsAdminUser(const string& username) const
+{
+    auto it = m_users.find(username);
+    if (it == m_users.end()) return false;
+    return it->second.role == UserRole::ADMIN;
 }
 
-void Admin::changeOwnPassword(const string& newPassword) {
-    if (!validatePassword(newPassword)) {
+void Admin::ChangeOwnPassword(const string& newPassword)
+{
+    if (!ValidatePassword(newPassword))
+    {
         throw invalid_argument("Новий пароль не відповідає вимогам безпеки");
     }
 
-    users[username] = newPassword;
+    m_users[m_username].password = newPassword;
 
-    if (!saveUsersToFile("users.txt")) {
+    if (!SaveUsersToFile("users.txt"))
+    {
         throw runtime_error("Не вдалося зберегти користувачів у файл");
     }
 
     cout << "Ваш пароль успішно змінено!" << endl;
 }
 
-vector<string> Admin::getAllUsernames() const {
+vector<string> Admin::GetAllUsernames() const
+{
     vector<string> usernames;
-    for (const auto& user : users) {
+    for (const auto& user : m_users)
+    {
         usernames.push_back(user.first);
     }
     return usernames;

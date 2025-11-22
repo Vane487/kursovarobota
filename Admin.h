@@ -1,4 +1,5 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -6,15 +7,57 @@
 #include <fstream>
 #include <functional>
 
-class Admin {
-private:
-    std::string username;
-    std::string password;
-    std::unordered_map<std::string, std::string> users;
+/**
+ * @brief Ролі користувачів системи
+ */
+enum class UserRole {
+    ADMIN,      ///< Адміністратор
+    STUDENT     ///< Студент
+};
 
-    void initializeDefaultAdmin();
-    std::string hashPassword(const std::string& password) const;
-    bool verifyPassword(const std::string& inputPassword, const std::string& storedPassword) const;
+/**
+ * @brief Клас для управління адміністративними функціями
+ *
+ * Надає функціонал для керування користувачами, автентифікації
+ * та роботи з файлами користувачів
+ */
+class Admin
+{
+private:
+    std::string m_username;     ///< Ім'я користувача
+    std::string m_password;     ///< Хеш пароля
+
+    // Структура для зберігання даних користувача
+    struct UserData {
+        std::string password;
+        UserRole role;
+
+        UserData(const std::string& pwd = "", UserRole r = UserRole::STUDENT)
+            : password(pwd), role(r) {}
+    };
+
+    std::unordered_map<std::string, UserData> m_users;  ///< База користувачів
+
+    /// @brief Ініціалізує адміністратора за замовчуванням
+    void InitializeDefaultAdmin();
+
+    /// @brief Хешує пароль
+    /// @param password Пароль для хешування
+    /// @return Хеш пароля
+    std::string HashPassword(const std::string& password) const;
+
+    /// @brief Перевіряє відповідність пароля
+    /// @param inputPassword Введений пароль
+    /// @param storedPassword Збережений хеш
+    /// @return true якщо паролі співпадають
+    bool VerifyPassword(const std::string& inputPassword,
+                       const std::string& storedPassword) const;
+
+    /// @brief Конвертує роль у рядок
+    std::string RoleToString(UserRole role) const;
+
+    /// @brief Конвертує рядок у роль
+    UserRole StringToRole(const std::string& roleStr) const;
 
 public:
     // Конструктори та деструктор
@@ -24,33 +67,32 @@ public:
     Admin(Admin&& other) noexcept;
     ~Admin();
 
-    // Getter методи
-    std::string getUsername() const { return username; }
-    std::string getPassword() const { return password; }
-    std::unordered_map<std::string, std::string> getUsers() const { return users; }
+    // Властивості
+    std::string GetUsername() const { return m_username; }
+    std::string GetPassword() const { return m_password; }
 
-    // Setter методи
-    void setUsername(const std::string& newUsername);
-    void setPassword(const std::string& newPassword);
-    void setUsers(const std::unordered_map<std::string, std::string>& newUsers);
+    void SetUsername(const std::string& newUsername);
+    void SetPassword(const std::string& newPassword);
 
-    // ВЛАСНІ МЕТОДИ (12+ методів):
-    bool addUser(const std::string& username, const std::string& password);
-    bool removeUser(const std::string& username);
-    bool changePassword(const std::string& username, const std::string& newPassword);
-    bool authenticate(const std::string& username, const std::string& password) const;
-    void listUsers() const;
-    void resetPassword(const std::string& username);
-    void exportUsers(const std::string& filename) const;
-    bool loadUsersFromFile(const std::string& filename);
-    bool saveUsersToFile(const std::string& filename) const;
-    static bool validatePassword(const std::string& password);
-    bool userExists(const std::string& username) const;
-    int getUserCount() const;
-    void displayUserInfo(const std::string& username) const;
-    bool isAdminUser(const std::string& username) const;
-    void changeOwnPassword(const std::string& newPassword);
-    std::vector<std::string> getAllUsernames() const;
+    // Методи керування користувачами
+    bool AddUser(const std::string& username, const std::string& password, UserRole role = UserRole::STUDENT);
+    bool RemoveUser(const std::string& username);
+    bool ChangePassword(const std::string& username, const std::string& newPassword);
+    bool ChangeUserRole(const std::string& username, UserRole newRole);
+    bool Authenticate(const std::string& username, const std::string& password) const;
+    UserRole GetUserRole(const std::string& username) const;
+    void ListUsers() const;
+    void ResetPassword(const std::string& username);
+    void ExportUsers(const std::string& filename) const;
+    bool LoadUsersFromFile(const std::string& filename);
+    bool SaveUsersToFile(const std::string& filename) const;
+    static bool ValidatePassword(const std::string& password);
+    bool UserExists(const std::string& username) const;
+    int GetUserCount() const;
+    void DisplayUserInfo(const std::string& username) const;
+    bool IsAdminUser(const std::string& username) const;
+    void ChangeOwnPassword(const std::string& newPassword);
+    std::vector<std::string> GetAllUsernames() const;
 
     // Оператори
     Admin& operator=(const Admin& other);
