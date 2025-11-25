@@ -180,10 +180,7 @@ bool Subject::matchesSearchCriteria(const string& criteria) const
            lowerId.find(lowerCriteria) != string::npos;
 }
 
-bool Subject::canBeAssignedToTeacher(const string& teacherId) const
-{
-    return !hasAssignedTeacher() || this->teacherId == teacherId;
-}
+// ВИДАЛЕНО: метод canBeAssignedToTeacher
 
 //-----------------------------------------------------------------------------
 // Перевизначені методи

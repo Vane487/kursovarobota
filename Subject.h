@@ -169,8 +169,6 @@ public:
      * @param teacherId Ідентифікатор викладача
      * @return true якщо може бути призначений
      */
-    bool canBeAssignedToTeacher(const std::string& teacherId) const;
-
     // Перевизначені методи
 
     /**

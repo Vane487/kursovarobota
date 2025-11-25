@@ -1,90 +1,67 @@
-#pragma once
+#ifndef DATABASEMANAGER_H
+#define DATABASEMANAGER_H
 
 #include "Student.h"
 #include "Teacher.h"
 #include "Subject.h"
 #include <vector>
 #include <string>
-#include <algorithm>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
 
 namespace University {
 
-class DatabaseManager
-{
+class DatabaseManager {
 private:
     std::vector<Student> m_students;
     std::vector<Teacher> m_teachers;
     std::vector<Subject> m_subjects;
 
 public:
-    // Конструктори та деструктор
+    // Constructors and destructor
     DatabaseManager();
+    DatabaseManager(const std::string& studentsFile,
+                   const std::string& teachersFile,
+                   const std::string& subjectsFile);
     DatabaseManager(const DatabaseManager& other);
     DatabaseManager(DatabaseManager&& other) noexcept;
     ~DatabaseManager();
 
-    // Властивості
-    std::vector<Student>& GetStudents();
-    const std::vector<Student>& GetStudents() const;
-    std::vector<Teacher>& GetTeachers();
-    const std::vector<Teacher>& GetTeachers() const;
-    std::vector<Subject>& GetSubjects();
-    const std::vector<Subject>& GetSubjects() const;
-
-    void SetStudents(const std::vector<Student>& newStudents);
-    void SetTeachers(const std::vector<Teacher>& newTeachers);
-    void SetSubjects(const std::vector<Subject>& newSubjects);
-
-    // Студенти
-    void AddStudent(const Student& student);
-    bool EditStudent(const std::string& studentId, const Student& newData);
-    bool DeleteStudent(const std::string& studentId);
-    Student* GetStudent(const std::string& studentId);
-    const Student* GetStudent(const std::string& studentId) const;
+    // Student methods
     std::vector<Student> GetAllStudents() const;
-    std::vector<Student> SearchStudentsByName(const std::string& name) const;
-    std::vector<Student> SearchStudentsByProgram(const std::string& program) const;
-    void SortStudentsByName(bool ascending = true);
-    void SortStudentsById(bool ascending = true);
+    Student* GetStudent(const std::string& id);
+    bool AddStudent(const Student& student);
+    bool EditStudent(const std::string& id, const Student& updatedStudent);
+    bool DeleteStudent(const std::string& id);
 
-    // Викладачі
-    void AddTeacher(const Teacher& teacher);
-    bool EditTeacher(const std::string& teacherId, const Teacher& newData);
-    bool DeleteTeacher(const std::string& teacherId);
-    Teacher* GetTeacher(const std::string& teacherId);
-    const Teacher* GetTeacher(const std::string& teacherId) const;
+    // Teacher methods
     std::vector<Teacher> GetAllTeachers() const;
-    std::vector<Teacher> SearchTeachersByName(const std::string& name) const;
-    std::vector<Teacher> SearchTeachersByDepartment(const std::string& department) const;
-    std::vector<Teacher> FilterTeachersByDegree(const std::string& degree) const;
-    void SortTeachersByName(bool ascending = true);
-    void SortTeachersById(bool ascending = true);
+    Teacher* GetTeacher(const std::string& id);
+    bool AddTeacher(const Teacher& teacher);
+    bool EditTeacher(const std::string& id, const Teacher& updatedTeacher);
+    bool DeleteTeacher(const std::string& id);
 
-    // Предмети
-    void AddSubject(const Subject& subject);
-    bool EditSubject(const std::string& subjectId, const Subject& newData);
-    bool DeleteSubject(const std::string& subjectId);
-    Subject* GetSubject(const std::string& subjectId);
-    const Subject* GetSubject(const std::string& subjectId) const;
+    // Subject methods
     std::vector<Subject> GetAllSubjects() const;
+    Subject* GetSubject(const std::string& id);
+    bool AddSubject(const Subject& subject);
+    bool EditSubject(const std::string& id, const Subject& updatedSubject);
+    bool DeleteSubject(const std::string& id);
+
+    // Search
+    std::vector<Student> SearchStudentsByName(const std::string& name) const;
+    std::vector<Teacher> SearchTeachersByName(const std::string& name) const;
     std::vector<Subject> SearchSubjectsByName(const std::string& name) const;
-    std::vector<Subject> FilterSubjectsByCredits(int minCredits, int maxCredits) const;
+
+    // Filtering
+    std::vector<Student> FilterStudentsByProgram(const std::string& program) const;
+    std::vector<Teacher> FilterTeachersByDepartment(const std::string& department) const;
     std::vector<Subject> FilterSubjectsBySemester(int semester) const;
-    std::vector<Subject> FilterSubjectsByTeacher(const std::string& teacherId) const;
+
+    // Sorting
+    void SortStudentsByName(bool ascending = true);
+    void SortTeachersByName(bool ascending = true);
     void SortSubjectsByName(bool ascending = true);
-    void SortSubjectsByCredits(bool ascending = true);
 
-    // ПРИЗНАЧЕННЯ СТУДЕНТІВ НА ПРЕДМЕТИ - ДОДАЙТЕ ЦЕЙ БЛОК
-    bool AssignStudentToSubject(const std::string& studentId, const std::string& subjectId);
-    bool RemoveStudentFromSubject(const std::string& studentId, const std::string& subjectId);
-    std::vector<Subject> GetStudentSubjects(const std::string& studentId) const;
-    std::vector<Student> GetSubjectStudents(const std::string& subjectId) const;
-    bool IsStudentAssignedToSubject(const std::string& studentId, const std::string& subjectId) const;
-
-    // Файлові операції
+    // File operations
     bool LoadFromFile(const std::string& studentsFile,
                      const std::string& teachersFile,
                      const std::string& subjectsFile);
@@ -92,17 +69,11 @@ public:
                    const std::string& teachersFile,
                    const std::string& subjectsFile) const;
 
-    // Утиліти
+    // Utility
     void Clear();
-    int GetStudentCount() const;
-    int GetTeacherCount() const;
-    int GetSubjectCount() const;
 
-    // Розширений пошук
-    std::vector<Teacher> FindTeachersWithoutSubjects() const;
-    std::vector<Subject> FindSubjectsWithoutTeacher() const;
 
-private:
+    // Private file operation methods
     bool LoadStudentsFromFile(const std::string& filename);
     bool LoadTeachersFromFile(const std::string& filename);
     bool LoadSubjectsFromFile(const std::string& filename);
@@ -112,3 +83,5 @@ private:
 };
 
 } // namespace University
+
+#endif // DATABASEMANAGER_H

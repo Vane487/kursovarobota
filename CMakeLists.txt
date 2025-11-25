@@ -12,8 +12,14 @@ add_executable(Kursova main.cpp
         IPrint.h
         DatabaseManager.cpp
         DatabaseManager.h
-        Admin.cpp
-        Admin.h
+        UserManager.cpp
+        UserManager.h
         Person.cpp
         Person.h
-        Teacher.cpp)
+        Teacher.cpp
+        AssignmentManager.cpp
+        AssignmentManager.h
+        MenuManager.cpp
+        MenuManager.h
+        FileConstants.cpp
+        FileConstants.h)
