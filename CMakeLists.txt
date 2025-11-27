@@ -22,4 +22,5 @@ add_executable(Kursova main.cpp
         MenuManager.cpp
         MenuManager.h
         FileConstants.cpp
-        FileConstants.h)
+        FileConstants.h
+)

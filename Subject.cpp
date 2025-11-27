@@ -46,11 +46,30 @@ Subject::~Subject()
 //-----------------------------------------------------------------------------
 // Властивості
 //-----------------------------------------------------------------------------
-string Subject::getSubjectId() const { return subjectId; }
-string Subject::getSubjectName() const { return subjectName; }
-int Subject::getEctsCredits() const { return ectsCredits; }
-string Subject::getTeacherId() const { return teacherId; }
-int Subject::getSemester() const { return semester; }
+string Subject::getSubjectId() const
+{
+    return subjectId;
+}
+
+string Subject::getSubjectName() const
+{
+    return subjectName;
+}
+
+int Subject::getEctsCredits() const
+{
+    return ectsCredits;
+}
+
+string Subject::getTeacherId() const
+{
+    return teacherId;
+}
+
+int Subject::getSemester() const
+{
+    return semester;
+}
 
 void Subject::setSubjectId(const string& id)
 {
@@ -214,7 +233,10 @@ bool Subject::operator==(const Subject& other) const
 //-----------------------------------------------------------------------------
 bool Subject::validateSubjectID(const string& id) const
 {
-    if (id.empty()) return false;
+    if (id.empty())
+    {
+        return false;
+    }
 
     return all_of(id.begin(), id.end(), [](char c)
     {

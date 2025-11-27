@@ -8,9 +8,9 @@ using namespace University;
 
 // Ініціалізація констант для стартового меню
 const string MenuManager::WELCOME_MENU_TITLE =
-    "===========================================\n"
-    "      СИСТЕМА УПРАВЛІННЯ УНІВЕРСИТЕТОМ\n"
-    "===========================================";
+    "==================================================\n"
+    "      СИСТЕМА УПРАВЛІННЯ НАВЧАЛЬНИМ ЗАКЛАДОМ \n"
+    "==================================================";
 
 const string MenuManager::WELCOME_MENU_OPTION_1 = "1. Увійти до системи";
 const string MenuManager::WELCOME_MENU_OPTION_2 = "2. Допомога";
@@ -95,32 +95,43 @@ const string MenuManager::INPUT_SORT_ORDER = "Порядок сортуванн�
 MenuManager::MenuManager(UserManager* userManager, DatabaseManager* dbManager,
                          AssignmentManager* assignmentManager, const string& username, UserRole role)
     : m_userManager(userManager), m_dbManager(dbManager), m_assignmentManager(assignmentManager),
-      m_currentUser(username), m_currentRole(role) {}
+      m_currentUser(username), m_currentRole(role)
+{
+}
 
-MenuManager::MenuManager() : m_userManager(nullptr), m_dbManager(nullptr),
-                            m_assignmentManager(nullptr), m_currentUser(""),
-                            m_currentRole(UserRole::Student) {}
+MenuManager::MenuManager()
+    : m_userManager(nullptr), m_dbManager(nullptr),
+      m_assignmentManager(nullptr), m_currentUser(""),
+      m_currentRole(UserRole::Student)
+{
+}
 
 MenuManager::MenuManager(const MenuManager& other)
     : m_userManager(other.m_userManager), m_dbManager(other.m_dbManager),
       m_assignmentManager(other.m_assignmentManager), m_currentUser(other.m_currentUser),
-      m_currentRole(other.m_currentRole) {}
+      m_currentRole(other.m_currentRole)
+{
+}
 
 MenuManager::MenuManager(MenuManager&& other) noexcept
     : m_userManager(other.m_userManager), m_dbManager(other.m_dbManager),
       m_assignmentManager(other.m_assignmentManager),
-m_currentUser(std::move(other.m_currentUser)), m_currentRole(other.m_currentRole) {
+      m_currentUser(std::move(other.m_currentUser)), m_currentRole(other.m_currentRole)
+{
     other.m_userManager = nullptr;
     other.m_dbManager = nullptr;
     other.m_assignmentManager = nullptr;
 }
 
-MenuManager::~MenuManager() {
+MenuManager::~MenuManager()
+{
     cout << "MenuManager для користувача " << m_currentUser << " знищено" << endl;
 }
 
-MenuManager& MenuManager::operator=(const MenuManager& other) {
-    if (this != &other) {
+MenuManager& MenuManager::operator=(const MenuManager& other)
+{
+    if (this != &other)
+    {
         m_userManager = other.m_userManager;
         m_dbManager = other.m_dbManager;
         m_assignmentManager = other.m_assignmentManager;
@@ -130,8 +141,10 @@ MenuManager& MenuManager::operator=(const MenuManager& other) {
     return *this;
 }
 
-MenuManager& MenuManager::operator=(MenuManager&& other) noexcept {
-    if (this != &other) {
+MenuManager& MenuManager::operator=(MenuManager&& other) noexcept
+{
+    if (this != &other)
+    {
         m_userManager = other.m_userManager;
         m_dbManager = other.m_dbManager;
         m_assignmentManager = other.m_assignmentManager;
@@ -145,50 +158,96 @@ MenuManager& MenuManager::operator=(MenuManager&& other) noexcept {
 }
 
 // Гетери/Сетери
-UserManager* MenuManager::getUserManager() const { return m_userManager; }
-void MenuManager::setUserManager(UserManager* userManager) { m_userManager = userManager; }
-DatabaseManager* MenuManager::getDatabaseManager() const { return m_dbManager; }
-void MenuManager::setDatabaseManager(DatabaseManager* dbManager) { m_dbManager = dbManager; }
-AssignmentManager* MenuManager::getAssignmentManager() const { return m_assignmentManager; }
-void MenuManager::setAssignmentManager(AssignmentManager* assignmentManager) { m_assignmentManager = assignmentManager; }
-string MenuManager::getCurrentUser() const { return m_currentUser; }
-void MenuManager::setCurrentUser(const string& user) { m_currentUser = user; }
-UserRole MenuManager::getCurrentRole() const { return m_currentRole; }
-void MenuManager::setCurrentRole(UserRole role) { m_currentRole = role; }
+UserManager* MenuManager::getUserManager() const
+{
+    return m_userManager;
+}
+
+void MenuManager::setUserManager(UserManager* userManager)
+{
+    m_userManager = userManager;
+}
+
+DatabaseManager* MenuManager::getDatabaseManager() const
+{
+    return m_dbManager;
+}
+
+void MenuManager::setDatabaseManager(DatabaseManager* dbManager)
+{
+    m_dbManager = dbManager;
+}
+
+AssignmentManager* MenuManager::getAssignmentManager() const
+{
+    return m_assignmentManager;
+}
+
+void MenuManager::setAssignmentManager(AssignmentManager* assignmentManager)
+{
+    m_assignmentManager = assignmentManager;
+}
+
+string MenuManager::getCurrentUser() const
+{
+    return m_currentUser;
+}
+
+void MenuManager::setCurrentUser(const string& user)
+{
+    m_currentUser = user;
+}
+
+UserRole MenuManager::getCurrentRole() const
+{
+    return m_currentRole;
+}
+
+void MenuManager::setCurrentRole(UserRole role)
+{
+    m_currentRole = role;
+}
 
 // Основні методи
-void MenuManager::DisplayWelcome() const {
+void MenuManager::DisplayWelcome() const
+{
     cout << "Ласкаво просимо, " << m_currentUser << "!" << endl;
 }
 
-void MenuManager::Logout() {
+void MenuManager::Logout()
+{
     m_currentUser = "";
     m_currentRole = UserRole::Student;
     cout << "Вихід виконано успішно" << endl;
 }
 
-bool MenuManager::ValidateAccess(UserRole requiredRole) const {
+bool MenuManager::ValidateAccess(UserRole requiredRole) const
+{
     return m_currentRole >= requiredRole;
 }
 
-bool MenuManager::IsAdmin() const {
+bool MenuManager::IsAdmin() const
+{
     return m_currentRole == UserRole::Admin;
 }
 
 // Допоміжні методи
-void MenuManager::Denied() {
+void MenuManager::Denied()
+{
     cout << ACCESS_DENIED << ADMIN_ONLY << endl;
     PressAnyKey();
 }
 
-string MenuManager::GetInput(const string& text) {
+string MenuManager::GetInput(const string& text)
+{
     cout << text;
     string s;
     getline(cin, s);
     return s;
 }
 
-int MenuManager::GetIntInput(const string& text) {
+int MenuManager::GetIntInput(const string& text)
+{
     cout << text;
     int x;
     cin >> x;
@@ -196,11 +255,13 @@ int MenuManager::GetIntInput(const string& text) {
     return x;
 }
 
-void MenuManager::ClearInputBuffer() {
+void MenuManager::ClearInputBuffer()
+{
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-void MenuManager::ClearScreen() const {
+void MenuManager::ClearScreen() const
+{
 #if defined(_WIN32)
     system("cls");
 #else
@@ -208,28 +269,38 @@ void MenuManager::ClearScreen() const {
 #endif
 }
 
-void MenuManager::PressAnyKey() const {
+void MenuManager::PressAnyKey() const
+{
     cout << PRESS_ENTER;
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-string MenuManager::RoleToString(UserRole role) const {
-    switch (role) {
-        case UserRole::Admin: return FileConstants::ROLE_ADMIN;
-        case UserRole::Teacher: return FileConstants::ROLE_TEACHER;
-        case UserRole::Student: return FileConstants::ROLE_STUDENT;
-        default: return "Невідома роль";
+string MenuManager::RoleToString(UserRole role) const
+{
+    switch (role)
+    {
+        case UserRole::Admin:
+            return FileConstants::ROLE_ADMIN;
+        case UserRole::Teacher:
+            return FileConstants::ROLE_TEACHER;
+        case UserRole::Student:
+            return FileConstants::ROLE_STUDENT;
+        default:
+            return "Невідома роль";
     }
 }
 
 // Методи для виводу списків
-void MenuManager::PrintStudentList(const vector<Student>& list, const string& title) const {
+void MenuManager::PrintStudentList(const vector<Student>& list, const string& title) const
+{
     cout << "\n=== " << title << " ===\n";
-    if (list.empty()) {
+    if (list.empty())
+    {
         cout << "Студенти відсутні\n";
         return;
     }
-    for (const auto& student : list) {
+    for (const auto& student : list)
+    {
         cout << "ID: " << student.getStudentID()
              << " | Ім'я: " << student.getName()
              << " " << student.getLastName()
@@ -239,19 +310,30 @@ void MenuManager::PrintStudentList(const vector<Student>& list, const string& ti
     cout << "Всього студентів: " << list.size() << "\n";
 }
 
-void MenuManager::PrintTeacherList(const vector<Teacher>& list, const string& title) const {
+void MenuManager::PrintTeacherList(const vector<Teacher>& list, const string& title) const
+{
     cout << "\n=== " << title << " ===\n";
-    if (list.empty()) {
+    if (list.empty())
+    {
         cout << "Викладачі відсутні\n";
         return;
     }
-    for (const auto& teacher : list) {
+    for (const auto& teacher : list)
+    {
         string degreeStr;
-        switch(teacher.getAcademicDegree()) {
-            case AcademicDegree::BACHELOR: degreeStr = "Бакалавр"; break;
-            case AcademicDegree::MASTER: degreeStr = "Магістр"; break;
-            case AcademicDegree::DOCTOR: degreeStr = "Доктор"; break;
-            default: degreeStr = "Невідомий";
+        switch (teacher.getAcademicDegree())
+        {
+            case AcademicDegree::BACHELOR:
+                degreeStr = "Бакалавр";
+                break;
+            case AcademicDegree::MASTER:
+                degreeStr = "Магістр";
+                break;
+            case AcademicDegree::DOCTOR:
+                degreeStr = "Доктор";
+                break;
+            default:
+                degreeStr = "Невідомий";
         }
 
         cout << "ID: " << teacher.getTeacherID()
@@ -264,13 +346,16 @@ void MenuManager::PrintTeacherList(const vector<Teacher>& list, const string& ti
     cout << "Всього викладачів: " << list.size() << "\n";
 }
 
-void MenuManager::PrintSubjectList(const vector<Subject>& list, const string& title) const {
+void MenuManager::PrintSubjectList(const vector<Subject>& list, const string& title) const
+{
     cout << "\n=== " << title << " ===\n";
-    if (list.empty()) {
+    if (list.empty())
+    {
         cout << "Предмети відсутні\n";
         return;
     }
-    for (const auto& subject : list) {
+    for (const auto& subject : list)
+    {
         cout << "ID: " << subject.getSubjectId()
              << " | Назва: " << subject.getSubjectName()
              << " | Кредити: " << subject.getEctsCredits()
@@ -281,13 +366,16 @@ void MenuManager::PrintSubjectList(const vector<Subject>& list, const string& ti
 }
 
 // НОВИЙ МЕТОД: Завантаження всіх даних
-void MenuManager::LoadAllData() {
-    if (m_dbManager && m_userManager) {
+void MenuManager::LoadAllData()
+{
+    if (m_dbManager && m_userManager)
+    {
         cout << "Завантаження даних з файлів..." << endl;
 
-        m_dbManager->LoadStudentsFromFile(FileConstants::STUDENTS_FILE);
-        m_dbManager->LoadTeachersFromFile(FileConstants::TEACHERS_FILE);
-        m_dbManager->LoadSubjectsFromFile(FileConstants::SUBJECTS_FILE);
+        // Use the public method instead:
+        m_dbManager->LoadFromFile(FileConstants::STUDENTS_FILE,
+                                 FileConstants::TEACHERS_FILE,
+                                 FileConstants::SUBJECTS_FILE);
         m_userManager->LoadUsersFromFile(FileConstants::USERS_FILE);
 
         cout << "Дані успішно завантажені!" << endl;
@@ -296,11 +384,13 @@ void MenuManager::LoadAllData() {
 }
 
 // Меню
-void MenuManager::ShowWelcomeMenu() {
+void MenuManager::ShowWelcomeMenu()
+{
     LoadAllData();
 
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << WELCOME_MENU_TITLE << "\n\n";
         cout << WELCOME_MENU_OPTION_1 << "\n";
@@ -311,19 +401,24 @@ void MenuManager::ShowWelcomeMenu() {
         cin >> choice;
         ClearInputBuffer();
 
-        switch (choice) {
-            case 1: {
+        switch (choice)
+        {
+            case 1:
+            {
                 string username = GetInput(FileConstants::MSG_LOGIN_PROMPT);
                 string password = GetInput(FileConstants::MSG_PASSWORD_PROMPT);
 
                 string authResult = m_userManager->Authenticate(username, password);
-                if (authResult.find("УСПІХ") != string::npos) {
+                if (authResult.find("УСПІХ") != string::npos)
+                {
                     m_currentUser = username;
                     m_currentRole = m_userManager->GetUserRole(username);
                     cout << FileConstants::MSG_LOGIN_SUCCESS << endl;
                     PressAnyKey();
                     ShowMainMenu();
-                } else {
+                }
+                else
+                {
                     cout << FileConstants::MSG_LOGIN_FAILED << endl;
                     PressAnyKey();
                 }
@@ -342,9 +437,11 @@ void MenuManager::ShowWelcomeMenu() {
     } while (true);
 }
 
-void MenuManager::ShowMainMenu() {
+void MenuManager::ShowMainMenu()
+{
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << MAIN_MENU_TITLE << "\n\n";
         cout << MAIN_MENU_CURRENT_USER << m_currentUser << "    |    Роль: " << RoleToString(m_currentRole) << "\n\n";
@@ -362,19 +459,35 @@ void MenuManager::ShowMainMenu() {
         cin >> choice;
         ClearInputBuffer();
 
-        if (choice == 1 && !IsAdmin()) {
+        if (choice == 1 && !IsAdmin())
+        {
             Denied();
             continue;
         }
 
-        switch (choice) {
-            case 1: ShowUserManagement(); break;
-            case 2: ShowStudentManagement(); break;
-            case 3: ShowTeacherManagement(); break;
-            case 4: ShowSubjectManagement(); break;
-            case 5: ShowAssignmentManagement(); break;
-            case 6: ShowSearchMenu(); break;
-            case 7: ShowHelp(); break;
+        switch (choice)
+        {
+            case 1:
+                ShowUserManagement();
+                break;
+            case 2:
+                ShowStudentManagement();
+                break;
+            case 3:
+                ShowTeacherManagement();
+                break;
+            case 4:
+                ShowSubjectManagement();
+                break;
+            case 5:
+                ShowAssignmentManagement();
+                break;
+            case 6:
+                ShowSearchMenu();
+                break;
+            case 7:
+                ShowHelp();
+                break;
             case 8:
                 cout << FileConstants::MSG_EXIT_SYSTEM << endl;
                 return;
@@ -385,14 +498,17 @@ void MenuManager::ShowMainMenu() {
     } while (true);
 }
 
-void MenuManager::ShowUserManagement() {
-    if (!IsAdmin()) {
+void MenuManager::ShowUserManagement()
+{
+    if (!IsAdmin())
+    {
         Denied();
         return;
     }
 
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << SUBMENU_TITLE << " - КОРИСТУВАЧІ\n\n";
         cout << SUBMENU_OPTION_1 << "\n";
@@ -406,51 +522,64 @@ void MenuManager::ShowUserManagement() {
         cin >> choice;
         ClearInputBuffer();
 
-        switch (choice) {
+        switch (choice)
+        {
             case 1:
                 cout << m_userManager->ListUsers() << endl;
                 PressAnyKey();
                 break;
-            case 2: {
+            case 2:
+            {
                 string username = GetInput("Введіть ім'я користувача: ");
                 string password = GetInput("Введіть пароль: ");
                 int roleChoice = GetIntInput("Виберіть роль (1-Студент, 2-Викладач, 3-Адмін): ");
 
                 UserRole role = UserRole::Student;
-                if (roleChoice == 2) role = UserRole::Teacher;
-                else if (roleChoice == 3) role = UserRole::Admin;
+                if (roleChoice == 2)
+                {
+                    role = UserRole::Teacher;
+                }
+                else if (roleChoice == 3)
+                {
+                    role = UserRole::Admin;
+                }
 
                 string result = m_userManager->AddUser(username, password, role);
                 cout << result << endl;
                 PressAnyKey();
                 break;
             }
-
-            case 3: {
+            case 3:
+            {
                 string username = GetInput("Введіть ім'я користувача для редагування: ");
                 string currentInfo = m_userManager->DisplayUserInfo(username);
                 cout << currentInfo << endl;
 
-                if (currentInfo.find("не знайдено") == string::npos) {
+                if (currentInfo.find("не знайдено") == string::npos)
+                {
                     string newPassword = GetInput("Введіть новий пароль: ");
                     int newRole = GetIntInput("Введіть нову роль (1-Студент, 2-Викладач, 3-Адмін): ");
 
                     string result = m_userManager->EditUser(username, newPassword, newRole);
                     cout << result << endl;
-                } else {
+                }
+                else
+                {
                     cout << "Користувача не знайдено." << endl;
                 }
                 PressAnyKey();
                 break;
             }
-            case 4: {
+            case 4:
+            {
                 string username = GetInput("Введіть ім'я користувача для видалення: ");
                 string result = m_userManager->RemoveUser(username);
                 cout << result << endl;
                 PressAnyKey();
                 break;
             }
-            case 5: {
+            case 5:
+            {
                 string username = GetInput("Введіть ім'я користувача для пошуку: ");
                 string result = m_userManager->DisplayUserInfo(username);
                 cout << result << endl;
@@ -466,21 +595,26 @@ void MenuManager::ShowUserManagement() {
     } while (choice != 0);
 }
 
-void MenuManager::ShowStudentManagement() {
+void MenuManager::ShowStudentManagement()
+{
     ShowGenericManagementMenu("СТУДЕНТИ", 1);
 }
 
-void MenuManager::ShowTeacherManagement() {
+void MenuManager::ShowTeacherManagement()
+{
     ShowGenericManagementMenu("ВИКЛАДАЧІ", 2);
 }
 
-void MenuManager::ShowSubjectManagement() {
+void MenuManager::ShowSubjectManagement()
+{
     ShowGenericManagementMenu("ПРЕДМЕТИ", 3);
 }
 
-void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
+void MenuManager::ShowGenericManagementMenu(const string& title, int type)
+{
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << SUBMENU_TITLE << " - " << title << "\n\n";
         cout << SUBMENU_OPTION_1 << "\n";
@@ -494,35 +628,51 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
         cin >> choice;
         ClearInputBuffer();
 
-        if (!IsAdmin() && (choice == 2 || choice == 3 || choice == 4)) {
+        if (!IsAdmin() && (choice == 2 || choice == 3 || choice == 4))
+        {
             Denied();
             continue;
         }
 
-        switch (choice) {
+        switch (choice)
+        {
             case 1:
-                if (type == 1) PrintStudentList(m_dbManager->GetAllStudents(), LIST_TITLE + " - СТУДЕНТИ");
-                else if (type == 2) PrintTeacherList(m_dbManager->GetAllTeachers(), LIST_TITLE + " - ВИКЛАДАЧІ");
-                else if (type == 3) PrintSubjectList(m_dbManager->GetAllSubjects(), LIST_TITLE + " - ПРЕДМЕТИ");
+                if (type == 1)
+                {
+                    PrintStudentList(m_dbManager->GetAllStudents(), LIST_TITLE + " - СТУДЕНТИ");
+                }
+                else if (type == 2)
+                {
+                    PrintTeacherList(m_dbManager->GetAllTeachers(), LIST_TITLE + " - ВИКЛАДАЧІ");
+                }
+                else if (type == 3)
+                {
+                    PrintSubjectList(m_dbManager->GetAllSubjects(), LIST_TITLE + " - ПРЕДМЕТИ");
+                }
                 PressAnyKey();
                 break;
 
             case 2:
-                if (type == 1) {
+                if (type == 1)
+                {
                     string name = GetInput(INPUT_NAME);
                     string last = GetInput(INPUT_LASTNAME);
                     string email = GetInput(INPUT_EMAIL);
                     string id = GetInput(INPUT_ID);
                     string program = GetInput(INPUT_PROGRAM);
 
-                    try {
+                    try
+                    {
                         m_dbManager->AddStudent(Student(name, last, email, id, program));
                         cout << ADDED_SUCCESS << endl;
-                    } catch (const exception& e) {
+                    }
+                    catch (const exception& e)
+                    {
                         cout << "ПОМИЛКА: " << e.what() << endl;
                     }
                 }
-                else if (type == 2) {
+                else if (type == 2)
+                {
                     string name = GetInput(INPUT_NAME);
                     string last = GetInput(INPUT_LASTNAME);
                     string email = GetInput(INPUT_EMAIL);
@@ -534,37 +684,56 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
                                        deg == 3 ? AcademicDegree::DOCTOR :
                                                   AcademicDegree::BACHELOR);
 
-                    try {
+                    try
+                    {
                         m_dbManager->AddTeacher(Teacher(name, last, email, id, dept, d));
                         cout << ADDED_SUCCESS << endl;
-                    } catch (const exception& e) {
+                    }
+                    catch (const exception& e)
+                    {
                         cout << "ПОМИЛКА: " << e.what() << endl;
                     }
                 }
-                else if (type == 3) {
+                else if (type == 3)
+                {
                     string id = GetInput(INPUT_ID);
                     string name = GetInput(INPUT_NAME);
                     int credits = GetIntInput(INPUT_CREDITS);
-                    string teacher = GetInput(INPUT_TEACHER_ID);
                     int sem = GetIntInput(INPUT_SEMESTER);
 
-                    try {
+                    // Опціональне введення ID викладача
+                    cout << "ID викладача (Enter - пропустити): ";
+                    string teacher;
+                    getline(cin, teacher);
+
+                    if (teacher.empty())
+                    {
+                        teacher = "Не призначено";
+                    }
+
+                    try
+                    {
                         m_dbManager->AddSubject(Subject(id, name, credits, teacher, sem));
                         cout << ADDED_SUCCESS << endl;
-                    } catch (const exception& e) {
+                    }
+                    catch (const exception& e)
+                    {
                         cout << "ПОМИЛКА: " << e.what() << endl;
                     }
                 }
                 PressAnyKey();
                 break;
 
-            case 3: {
+            case 3:
+            {
                 string id = GetInput("Введіть ID для редагування: ");
                 bool found = false;
 
-                if (type == 1) {
+                if (type == 1)
+                {
                     auto* s = m_dbManager->GetStudent(id);
-                    if (s) {
+                    if (s)
+                    {
                         string name = GetInput("Нове ім'я: ");
                         string last = GetInput("Нове прізвище: ");
                         string email = GetInput("Новий email: ");
@@ -576,9 +745,11 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
                         found = true;
                     }
                 }
-                else if (type == 2) {
+                else if (type == 2)
+                {
                     auto* t = m_dbManager->GetTeacher(id);
-                    if (t) {
+                    if (t)
+                    {
                         string name = GetInput("Нове ім'я: ");
                         string last = GetInput("Нове прізвище: ");
                         string email = GetInput("Новий email: ");
@@ -594,9 +765,11 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
                         found = true;
                     }
                 }
-                else if (type == 3) {
+                else if (type == 3)
+                {
                     auto* s = m_dbManager->GetSubject(id);
-                    if (s) {
+                    if (s)
+                    {
                         string name = GetInput("Нова назва: ");
                         int credits = GetIntInput("Нові кредити: ");
                         string teacher = GetInput("Новий ID викладача: ");
@@ -608,29 +781,52 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
                     }
                 }
 
-                if (!found) cout << NOT_FOUND << endl;
+                if (!found)
+                {
+                    cout << NOT_FOUND << endl;
+                }
                 PressAnyKey();
                 break;
             }
 
-            case 4: {
+            case 4:
+            {
                 string id = GetInput("Введіть ID для видалення: ");
                 bool success = false;
 
-                if (type == 1) success = m_dbManager->DeleteStudent(id);
-                else if (type == 2) success = m_dbManager->DeleteTeacher(id);
-                else if (type == 3) success = m_dbManager->DeleteSubject(id);
+                if (type == 1)
+                {
+                    success = m_dbManager->DeleteStudent(id);
+                }
+                else if (type == 2)
+                {
+                    success = m_dbManager->DeleteTeacher(id);
+                }
+                else if (type == 3)
+                {
+                    success = m_dbManager->DeleteSubject(id);
+                }
 
                 cout << (success ? DELETED_SUCCESS : NOT_FOUND) << endl;
                 PressAnyKey();
                 break;
             }
 
-            case 5: {
+            case 5:
+            {
                 string search = GetInput("Введіть ім'я для пошуку: ");
-                if (type == 1) PrintStudentList(m_dbManager->SearchStudentsByName(search), SEARCH_RESULTS);
-                else if (type == 2) PrintTeacherList(m_dbManager->SearchTeachersByName(search), SEARCH_RESULTS);
-                else if (type == 3) PrintSubjectList(m_dbManager->SearchSubjectsByName(search), SEARCH_RESULTS);
+                if (type == 1)
+                {
+                    PrintStudentList(m_dbManager->SearchStudentsByName(search), SEARCH_RESULTS);
+                }
+                else if (type == 2)
+                {
+                    PrintTeacherList(m_dbManager->SearchTeachersByName(search), SEARCH_RESULTS);
+                }
+                else if (type == 3)
+                {
+                    PrintSubjectList(m_dbManager->SearchSubjectsByName(search), SEARCH_RESULTS);
+                }
                 PressAnyKey();
                 break;
             }
@@ -645,9 +841,11 @@ void MenuManager::ShowGenericManagementMenu(const string& title, int type) {
     } while (choice != 0);
 }
 
-void MenuManager::ShowAssignmentManagement() {
+void MenuManager::ShowAssignmentManagement()
+{
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << "=== ПРИЗНАЧЕННЯ НА ПРЕДМЕТИ ===\n\n";
         cout << "1. Призначити викладача на предмет\n";
@@ -663,15 +861,19 @@ void MenuManager::ShowAssignmentManagement() {
         cin >> choice;
         ClearInputBuffer();
 
-        try {
-            switch (choice) {
-                case 1: {
+        try
+        {
+            switch (choice)
+            {
+                case 1:
+                {
                     string teacherId = GetInput("Введіть ID викладача: ");
                     string subjectId = GetInput("Введіть ID предмета: ");
 
                     // Перевірка чи існує викладач
                     Teacher* teacher = m_dbManager->GetTeacher(teacherId);
-                    if (!teacher) {
+                    if (!teacher)
+                    {
                         cout << "Помилка: Викладач з ID " << teacherId << " не знайдений!\n";
                         PressAnyKey();
                         break;
@@ -679,42 +881,52 @@ void MenuManager::ShowAssignmentManagement() {
 
                     // Перевірка чи існує предмет
                     Subject* subject = m_dbManager->GetSubject(subjectId);
-                    if (!subject) {
+                    if (!subject)
+                    {
                         cout << "Помилка: Предмет з ID " << subjectId << " не знайдений!\n";
                         PressAnyKey();
                         break;
                     }
 
-                    if (m_assignmentManager->assignToSubject(teacherId, subjectId)) {
+                    if (m_assignmentManager->assignToSubject(teacherId, subjectId))
+                    {
                         cout << "Призначення успішне!\n";
                     }
                     PressAnyKey();
                     break;
                 }
-                case 2: {
+                case 2:
+                {
                     string teacherId = GetInput("Введіть ID викладача для видалення призначення: ");
 
                     // Перевірка чи існує викладач
                     Teacher* teacher = m_dbManager->GetTeacher(teacherId);
-                    if (!teacher) {
+                    if (!teacher)
+                    {
                         cout << "Помилка: Викладач з ID " << teacherId << " не знайдений!\n";
                         PressAnyKey();
                         break;
                     }
 
-                    if (m_assignmentManager->removeFromSubject(teacherId)) {
+                    if (m_assignmentManager->removeFromSubject(teacherId))
+                    {
                         cout << "Призначення видалено!\n";
                     }
                     PressAnyKey();
                     break;
                 }
-                case 3: {
+                case 3:
+                {
                     auto assignments = m_assignmentManager->getAllTeacherAssignments();
                     cout << "\n=== ВСІ ПРИЗНАЧЕННЯ ВИКЛАДАЧІВ ===\n";
-                    if (assignments.empty()) {
+                    if (assignments.empty())
+                    {
                         cout << "Призначень немає\n";
-                    } else {
-                        for (const auto& assignment : assignments) {
+                    }
+                    else
+                    {
+                        for (const auto& assignment : assignments)
+                        {
                             Teacher* teacher = m_dbManager->GetTeacher(assignment.first);
                             Subject* subject = m_dbManager->GetSubject(assignment.second);
 
@@ -728,12 +940,14 @@ void MenuManager::ShowAssignmentManagement() {
                     PressAnyKey();
                     break;
                 }
-                case 4: {
+                case 4:
+                {
                     string teacherId = GetInput("Введіть ID викладача: ");
 
                     // Перевірка чи існує викладач
                     Teacher* teacher = m_dbManager->GetTeacher(teacherId);
-                    if (!teacher) {
+                    if (!teacher)
+                    {
                         cout << "Помилка: Викладач з ID " << teacherId << " не знайдений!\n";
                         PressAnyKey();
                         break;
@@ -752,13 +966,15 @@ void MenuManager::ShowAssignmentManagement() {
                     PressAnyKey();
                     break;
                 }
-                case 5: {
+                case 5:
+                {
                     string studentId = GetInput("Введіть ID студента: ");
                     string subjectId = GetInput("Введіть ID предмета: ");
 
                     // Перевірка чи існує студент
                     Student* student = m_dbManager->GetStudent(studentId);
-                    if (!student) {
+                    if (!student)
+                    {
                         cout << "Помилка: Студент з ID " << studentId << " не знайдений!\n";
                         PressAnyKey();
                         break;
@@ -766,55 +982,69 @@ void MenuManager::ShowAssignmentManagement() {
 
                     // Перевірка чи існує предмет
                     Subject* subject = m_dbManager->GetSubject(subjectId);
-                    if (!subject) {
+                    if (!subject)
+                    {
                         cout << "Помилка: Предмет з ID " << subjectId << " не знайдений!\n";
                         PressAnyKey();
                         break;
                     }
 
-                    if (m_assignmentManager->enrollStudentInSubject(studentId, subjectId)) {
+                    if (m_assignmentManager->enrollStudentInSubject(studentId, subjectId))
+                    {
                         cout << "Студента успішно записано на предмет!\n";
                     }
                     PressAnyKey();
                     break;
                 }
-                case 6: {
+                case 6:
+                {
                     string studentId = GetInput("Введіть ID студента: ");
                     string subjectId = GetInput("Введіть ID предмета: ");
 
-                    if (m_assignmentManager->unenrollStudentFromSubject(studentId, subjectId)) {
+                    if (m_assignmentManager->unenrollStudentFromSubject(studentId, subjectId))
+                    {
                         cout << "Студента успішно видалено з предмету!\n";
-                    } else {
+                    }
+                    else
+                    {
                         cout << "Запис не знайдено!\n";
                     }
                     PressAnyKey();
                     break;
                 }
-                case 7: {
+                case 7:
+                {
                     // ВИПРАВЛЕННЯ: Замінюємо getAllStudentEnrollments на пошук через всіх студентів
                     cout << "\n=== ВСІ ЗАПИСИ СТУДЕНТІВ ===\n";
                     vector<Student> allStudents = m_dbManager->GetAllStudents();
                     bool foundEnrollments = false;
 
-                    for (const auto& student : allStudents) {
+                    for (const auto& student : allStudents)
+                    {
                         string studentId = student.getStudentID();
                         vector<string> studentSubjects = m_assignmentManager->getStudentSubjects(studentId);
 
-                        if (!studentSubjects.empty()) {
+                        if (!studentSubjects.empty())
+                        {
                             foundEnrollments = true;
                             cout << "Студент: " << studentId << " (" << student.getFullName() << ") -> Предмети: ";
 
-                            for (size_t i = 0; i < studentSubjects.size(); ++i) {
+                            for (size_t i = 0; i < studentSubjects.size(); ++i)
+                            {
                                 Subject* subject = m_dbManager->GetSubject(studentSubjects[i]);
                                 string subjectName = subject ? subject->getSubjectName() : "Невідомий предмет";
                                 cout << studentSubjects[i] << " (" << subjectName << ")";
-                                if (i < studentSubjects.size() - 1) cout << ", ";
+                                if (i < studentSubjects.size() - 1)
+                                {
+                                    cout << ", ";
+                                }
                             }
                             cout << "\n";
                         }
                     }
 
-                    if (!foundEnrollments) {
+                    if (!foundEnrollments)
+                    {
                         cout << "Записів немає\n";
                     }
                     PressAnyKey();
@@ -826,16 +1056,20 @@ void MenuManager::ShowAssignmentManagement() {
                     cout << INVALID_CHOICE_MSG << endl;
                     PressAnyKey();
             }
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             cout << "ПОМИЛКА: " << e.what() << endl;
             PressAnyKey();
         }
     } while (choice != 0);
 }
 
-void MenuManager::ShowSearchMenu() {
+void MenuManager::ShowSearchMenu()
+{
     int choice;
-    do {
+    do
+    {
         ClearScreen();
         cout << SEARCH_MENU_TITLE << "\n\n";
         cout << SEARCH_STUDENT_OPTIONS << "\n\n";
@@ -847,67 +1081,74 @@ void MenuManager::ShowSearchMenu() {
         cin >> choice;
         ClearInputBuffer();
 
-        switch (choice) {
-            case 1: {
+        switch (choice)
+        {
+            case 1:
+            {
                 string name = GetInput(INPUT_SEARCH_NAME);
                 auto results = m_dbManager->SearchStudentsByName(name);
                 PrintStudentList(results, SEARCH_RESULTS + " - Студенти");
                 PressAnyKey();
                 break;
             }
-            case 2: {
+            case 2:
+            {
                 string program = GetInput(INPUT_PROGRAM);
                 auto results = m_dbManager->FilterStudentsByProgram(program);
                 PrintStudentList(results, FILTER_RESULTS + " - Студенти");
                 PressAnyKey();
                 break;
             }
-            case 3: {
+            case 3:
+            {
                 int order = GetIntInput(INPUT_SORT_ORDER);
-                m_dbManager->SortStudentsByName(order == 1);
-                cout << SORTED_SUCCESS << endl;
+                m_dbManager->DisplaySortedStudents(order == 1);
                 PressAnyKey();
                 break;
             }
-            case 4: {
+            case 4:
+            {
                 string name = GetInput(INPUT_SEARCH_NAME);
                 auto results = m_dbManager->SearchTeachersByName(name);
                 PrintTeacherList(results, SEARCH_RESULTS + " - Викладачі");
                 PressAnyKey();
                 break;
             }
-            case 5: {
+            case 5:
+            {
                 string department = GetInput(INPUT_DEPARTMENT);
                 auto results = m_dbManager->FilterTeachersByDepartment(department);
                 PrintTeacherList(results, FILTER_RESULTS + " - Викладачі");
                 PressAnyKey();
                 break;
             }
-            case 6: {
+            case 6:
+            {
                 int order = GetIntInput(INPUT_SORT_ORDER);
-                m_dbManager->SortTeachersByName(order == 1);
-                cout << SORTED_SUCCESS << endl;
+                m_dbManager->DisplaySortedTeachers(order == 1);
                 PressAnyKey();
                 break;
             }
-            case 7: {
+            case 7:
+            {
                 string name = GetInput(INPUT_SEARCH_NAME);
                 auto results = m_dbManager->SearchSubjectsByName(name);
                 PrintSubjectList(results, SEARCH_RESULTS + " - Предмети");
                 PressAnyKey();
                 break;
             }
-            case 8: {
+            case 8:
+            {
                 int semester = GetIntInput(INPUT_SEMESTER);
                 auto results = m_dbManager->FilterSubjectsBySemester(semester);
                 PrintSubjectList(results, FILTER_RESULTS + " - Предмети");
                 PressAnyKey();
                 break;
             }
-            case 9: {
+            case 9:
+            {
                 int order = GetIntInput(INPUT_SORT_ORDER);
-                m_dbManager->SortSubjectsByName(order == 1);
-                cout << SORTED_SUCCESS << endl;
+                m_dbManager->DisplaySortedSubjects(order == 1);
                 PressAnyKey();
                 break;
             }
@@ -920,7 +1161,8 @@ void MenuManager::ShowSearchMenu() {
     } while (choice != 0);
 }
 
-void MenuManager::ShowHelp() {
+void MenuManager::ShowHelp()
+{
     ClearScreen();
     cout << "=== ДОПОМОГА ===\n"
          << "Це консольна система університету.\n"
